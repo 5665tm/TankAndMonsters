@@ -88,7 +88,7 @@ ModelImporter:
       takeName: Take 001
       firstFrame: 1
       lastFrame: 30
-      wrapMode: 0
+      wrapMode: 2
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
@@ -164,7 +164,7 @@ ModelImporter:
       takeName: Take 001
       firstFrame: 40
       lastFrame: 70
-      wrapMode: 0
+      wrapMode: 2
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
@@ -240,7 +240,7 @@ ModelImporter:
       takeName: Take 001
       firstFrame: 80
       lastFrame: 104
-      wrapMode: 0
+      wrapMode: 1
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
@@ -316,7 +316,7 @@ ModelImporter:
       takeName: Take 001
       firstFrame: 130
       lastFrame: 150
-      wrapMode: 0
+      wrapMode: 1
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
@@ -392,7 +392,7 @@ ModelImporter:
       takeName: Take 001
       firstFrame: 160
       lastFrame: 190
-      wrapMode: 0
+      wrapMode: 1
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0

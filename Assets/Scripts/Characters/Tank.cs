@@ -5,6 +5,7 @@ namespace Characters
 	public class Tank : MonoBehaviour
 	{
 		private Rigidbody _rg;
+		private HealthSupport _healthSupport;
 
 		[SerializeField] private float _speedMove;
 		[SerializeField] private float _speedRotate;
@@ -12,6 +13,7 @@ namespace Characters
 		void Awake()
 		{
 			_rg = GetComponent<Rigidbody>();
+			_healthSupport = GetComponent<HealthSupport>();
 		}
 
 		void FixedUpdate()
@@ -39,6 +41,11 @@ namespace Characters
 				Quaternion deltaRotation = Quaternion.Euler(eulerAngleVelocity * Time.deltaTime);
 				_rg.MoveRotation(_rg.rotation * deltaRotation);
 			}
+		}
+
+		public void TakeDamage(float damage)
+		{
+			_healthSupport.TakeDamage(damage);
 		}
 	}
 }
