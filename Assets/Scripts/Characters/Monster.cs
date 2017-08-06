@@ -14,21 +14,21 @@ namespace Characters
 			Die
 		}
 
-		private AnimationSupport _animator;
+		private MonsterAnimationComponent _animator;
 		private MonsterState _state;
 		private Rigidbody _rg;
 
 		private float _lastChangedStateTime = 0;
 		private Tank _player;
 		private Transform _transform;
-		private HealthSupport _healthSupport;
+		private HealthComponent _healthComponent;
 
 		// сколько раз проиграть анимацию покоя после спавна моба
-		private const int PLAY_IDLE_COUNT = 3;
-		private const float ROTATE_SPEED = 2f;
-		private const int MOVE_SPEED = 1;
-		private const int DISTANCE_ATTACK_SQR = 6;
-		private const float DAMAGE = 10;
+		[SerializeField] private int _playIdleCount = 3;
+		[SerializeField] private float _rotateSpeed = 2f;
+		[SerializeField] private float _moveSpeed = 1;
+		[SerializeField] private float distanceAttackSqr = 6;
+		[SerializeField] private float _damage = 10;
 
 		// допустимо 0..1 - (0 - нанесение дамага происходит в начале анимации атаки, 1 - в конце, 0.5 - в середине)
 		private const float DAMAGED_TIME_MOMENT = 0.5f;
@@ -38,15 +38,20 @@ namespace Characters
 		private void Start()
 		{
 			_rg = GetComponent<Rigidbody>();
-			_animator = GetComponent<AnimationSupport>();
+			_animator = GetComponent<MonsterAnimationComponent>();
 			_transform = GetComponent<Transform>();
 			_player = FindObjectOfType<Tank>();
 
-			_healthSupport = GetComponent<HealthSupport>();
-			_healthSupport.DamagedEvent += OnDamagedHandler;
-			_healthSupport.DieEvent += OnDieHandler;
+			_healthComponent = GetComponent<HealthComponent>();
+			_healthComponent.DamagedEvent += OnDamagedHandler;
+			_healthComponent.DieEvent += OnDieHandler;
 
 			Reset();
+		}
+
+		public bool IsDied()
+		{
+			return _healthComponent.IsDied();
 		}
 
 		private void OnDamagedHandler()
@@ -59,10 +64,13 @@ namespace Characters
 			ChangeState(MonsterState.Die);
 		}
 
-		private void Reset()
+		public void Reset()
 		{
 			SetDefaultState();
-			_healthSupport.Reset();
+			if (_healthComponent != null)
+			{
+				_healthComponent.Reset();
+			}
 		}
 
 		private void SetDefaultState()
@@ -74,7 +82,10 @@ namespace Characters
 		{
 			_lastChangedStateTime = Time.timeSinceLevelLoad;
 			_state = state;
-			_animator.PlayAnimFromState(state);
+			if (_animator != null)
+			{
+				_animator.PlayAnimFromState(state);
+			}
 		}
 
 		private void TryChangeStateFromTimer(float time, MonsterState newState)
@@ -88,24 +99,24 @@ namespace Characters
 		private void RotateToPlayer()
 		{
 			Quaternion targetRotation = Quaternion.LookRotation(_player.transform.position - _transform.position);
-			_rg.MoveRotation( Quaternion.Slerp(_transform.rotation, targetRotation, ROTATE_SPEED*Time.deltaTime));
+			_rg.MoveRotation( Quaternion.Slerp(_transform.rotation, targetRotation, _rotateSpeed*Time.deltaTime));
 		}
 
 		private void MoveToPlayer()
 		{
-			Vector3 newPosition = _rg.position + transform.TransformDirection(0, 0, MOVE_SPEED*Time.deltaTime);
+			Vector3 newPosition = _rg.position + transform.TransformDirection(0, 0, _moveSpeed*Time.deltaTime);
 			_rg.MovePosition(newPosition);
 		}
 
 		private void IdleStateUpdate()
 		{
 			RotateToPlayer();
-			TryChangeStateFromTimer(_animator.GetAnimDuration(MonsterState.Idle) * PLAY_IDLE_COUNT, MonsterState.Move);
+			TryChangeStateFromTimer(_animator.GetAnimDuration(MonsterState.Idle) * _playIdleCount, MonsterState.Move);
 		}
 
 		private void MoveStateUpdate()
 		{
-			if (Vector3.SqrMagnitude(_transform.position - _player.transform.position) < DISTANCE_ATTACK_SQR)
+			if (Vector3.SqrMagnitude(_transform.position - _player.transform.position) < distanceAttackSqr)
 			{
 				_attackCommited = false;
 				ChangeState(MonsterState.Attack);
@@ -120,7 +131,7 @@ namespace Characters
 			var attackDuration = _animator.GetAnimDuration(MonsterState.Attack);
 			if (!_attackCommited && _lastChangedStateTime + attackDuration*DAMAGED_TIME_MOMENT < Time.timeSinceLevelLoad)
 			{
-				_player.TakeDamage(DAMAGE);
+				_player.TakeDamage(_damage);
 				_attackCommited = true;
 			}
 			RotateToPlayer();

@@ -1,19 +1,27 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Characters
 {
 	public class Tank : MonoBehaviour
 	{
 		private Rigidbody _rg;
-		private HealthSupport _healthSupport;
+		private HealthComponent _healthComponent;
 
 		[SerializeField] private float _speedMove;
 		[SerializeField] private float _speedRotate;
+		[SerializeField] private List<WeaponComponent> _weapons;
 
-		void Awake()
+		private int _activeWeaponIndex = 0;
+
+		public event Action<string> WeaponChangedEvent;
+
+		void Start()
 		{
 			_rg = GetComponent<Rigidbody>();
-			_healthSupport = GetComponent<HealthSupport>();
+			_healthComponent = GetComponent<HealthComponent>();
+			ChangeWeapon();
 		}
 
 		void FixedUpdate()
@@ -41,11 +49,33 @@ namespace Characters
 				Quaternion deltaRotation = Quaternion.Euler(eulerAngleVelocity * Time.deltaTime);
 				_rg.MoveRotation(_rg.rotation * deltaRotation);
 			}
+
+			if (Input.GetMouseButton(0))
+			{
+				Attack();
+			}
+
+			if (Input.GetKeyDown("q"))
+			{
+				ChangeWeapon();
+			}
 		}
 
 		public void TakeDamage(float damage)
 		{
-			_healthSupport.TakeDamage(damage);
+			_healthComponent.TakeDamage(damage);
+		}
+
+		private void Attack()
+		{
+			WeaponComponent weapon = _weapons[_activeWeaponIndex];
+			weapon.Attack();
+		}
+
+		private void ChangeWeapon()
+		{
+			_activeWeaponIndex = _activeWeaponIndex == 0 ? 1 : 0;
+			WeaponChangedEvent.SafeCall(_weapons[_activeWeaponIndex].GetIdentifier());
 		}
 	}
 }

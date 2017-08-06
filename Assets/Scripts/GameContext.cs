@@ -14,7 +14,10 @@ public class GameContext : MonoBehaviour
 	[SerializeField] private GameObject _inGameGo;
 	[SerializeField] private GameObject _endedGo;
 	[SerializeField] private Text _hpText;
-	[SerializeField] private HealthSupport _playerHealthSupport;
+	[SerializeField] private Text _gunText;
+
+	private Tank _playerTank;
+	private HealthComponent _playerHealthComponent;
 
 	private MenuState _state;
 	private enum MenuState
@@ -26,12 +29,20 @@ public class GameContext : MonoBehaviour
 
 	void Awake()
 	{
-		_playerHealthSupport.ChangedHpEvent += UpdateHpIndicator;
-		_playerHealthSupport.DieEvent += OnPlayerDiedHandler;
+		_playerTank = FindObjectOfType<Tank>();
+		_playerHealthComponent = _playerTank.gameObject.GetComponent<HealthComponent>();
+		_playerHealthComponent.ChangedHpEvent += UpdateHpIndicator;
+		_playerHealthComponent.DieEvent += OnPlayerDiedHandler;
+		_playerTank.WeaponChangedEvent += WeaponChangedHandler;
 
 		OnPlayerDiedHandler();
 
 		ChangeState(MenuState.Intro);
+	}
+
+	private void WeaponChangedHandler(string gunName)
+	{
+		_gunText.text = gunName;
 	}
 
 	private void UpdateHpIndicator(float hp)
