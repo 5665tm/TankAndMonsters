@@ -1,7 +1,8 @@
 ﻿using System;
+using Common;
 using UnityEngine;
 
-namespace Characters
+namespace Components
 {
 	public class HealthComponent : MonoBehaviour
 	{

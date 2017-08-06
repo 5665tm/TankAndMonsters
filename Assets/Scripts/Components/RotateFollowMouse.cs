@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Characters
+namespace Components
 {
 	public class RotateFollowMouse : MonoBehaviour
 	{

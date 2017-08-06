@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Common;
+using Components;
 using UnityEngine;
 
 namespace Characters
